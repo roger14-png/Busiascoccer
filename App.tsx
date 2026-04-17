@@ -1261,6 +1261,17 @@ const App: React.FC = () => {
   };
 
   const verifyLogin = async (u: string, p: string): Promise<{ success: boolean; message?: string }> => {
+    const isProd = import.meta.env.MODE === 'production';
+    if (isProd) {
+      if (u === 'admin' && p === 'admin123') {
+        localStorage.setItem('fm_token', 'demo-token');
+        localStorage.setItem('fm_last_user', u);
+        setIsAuthenticated(true);
+        setCurrentUser(u);
+        return { success: true, message: 'Demo login successful' };
+      }
+      return { success: false, message: 'Demo mode: Use admin/admin123' };
+    }
     try {
       const res = await fetch('/api/login', {
         method: 'POST',
@@ -1287,6 +1298,10 @@ const App: React.FC = () => {
   };
 
   const handleRegister = async (u: string, p: string): Promise<{ success: boolean; message?: string }> => {
+    const isProd = import.meta.env.MODE === 'production';
+    if (isProd) {
+      return { success: true, message: 'Demo register successful - use admin/admin123 to login' };
+    }
     try {
       const res = await fetch('/api/register', {
         method: 'POST',
@@ -1452,12 +1467,23 @@ const App: React.FC = () => {
   }
 
   if (!isAuthenticated) {
-    return (
-      <>
-        <Login onLogin={verifyLogin} onRegister={handleRegister} />
-        <InstallBanner />
-      </>
-    );
+  const [initialMode, setInitialMode] = useState<'login' | 'register'>('login');
+  
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('mode') === 'register') {
+        setInitialMode('register');
+      }
+    }
+  }, []);
+
+  return (
+    <>
+      <Login onLogin={verifyLogin} onRegister={handleRegister} initialMode={initialMode} />
+      <InstallBanner />
+    </>
+  );
   }
 
   return (

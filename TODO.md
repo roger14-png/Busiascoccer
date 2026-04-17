@@ -1,21 +1,17 @@
-# Fix Login/Signup Not Showing - BusiaSoccerMobile RN App
+# Fix Signup Not Showing on Vercel Live (https://busiasoccer.vercel.app/)
 
-## Plan Steps:
-- [x] 1. Start backend server ✅ Installed/running expected
-- [x] 3. Add dev fallback to AuthContext.tsx ✅ `__DEV__` skips server
-- [x] Fix types.ts merge conflict, add AuthState/User interfaces ✅ TS errors fixed
-- [ ] 2. PWA SW (web-only, skip for RN)
-- [x] 4. Ready to test: `npx expo start --clear`
-- [ ] 5. Verify login: admin/admin123 (local fallback) or server
-- [x] 6. Progress tracked
+## Current Status
+- [x] Diagnosed: Web Vite app, server/ backend local-only, /api fails on Vercel static deploy
+- [x] Login.tsx has signup toggle (no separate page)
+- [x] Server running local :4000 (EADDRINUSE confirms)
+- [ ] Live: auth fails silently → appears \"not showing\"
 
-**Status:** ✅ FIXED - Login shows immediately in Expo dev mode (`__DEV__` true). Server optional.
+## Implementation Steps
+- [ ] 1. Update App.tsx: Add ?mode=register URL param + Vercel prod fallback auth
+- [ ] 2. Configure vercel.json for serverless backend (/api → server/index.js)
+- [ ] 3. Deploy: `npx vercel --prod`
+- [ ] 4. Test: https://busiasoccer.vercel.app/?mode=register → toggle shows signup, works w/o server
+- [ ] 5. Optional: BusiaSoccerMobile RN (separate Expo deploy)
 
-**Final test:** 
-1. New terminal: `cd server & node index.js` (logs "Auth server on :4000")
-2. New terminal: `npx expo start --clear`
-3. Expo Go/emulator → Landing → Sign In → LoginScreen renders.
+**Next:** Edit App.tsx → Approve to proceed?
 
-Default creds: admin / admin123
-
-Login now works offline/dev!
