@@ -1,0 +1,14 @@
+{
+  "users": [
+    {
+      "id": "mj9x0lwj",
+      "username": "tonny",
+      "passwordHash": "$2b$10$Suo6C2x.BFcPlsqxwJ1KVunEpQtbWtB87DFLk4vAUd5fCQzCYLjX6"
+    },
+    {
+      "id": "mjbd7uth",
+      "username": "ouma",
+      "passwordHash": "$2b$10$9k8AIn36hjwHq1zRUbfUQu3qHnlrmb1xf1oYu4ZU301tEWX5XKJya"
+    }
+  ]
+}
