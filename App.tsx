@@ -1467,23 +1467,12 @@ const App: React.FC = () => {
   }
 
   if (!isAuthenticated) {
-  const [initialMode, setInitialMode] = useState<'login' | 'register'>('login');
-  
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      if (params.get('mode') === 'register') {
-        setInitialMode('register');
-      }
-    }
-  }, []);
-
-  return (
-    <>
-      <Login onLogin={verifyLogin} onRegister={handleRegister} initialMode={initialMode} />
-      <InstallBanner />
-    </>
-  );
+    return (
+      <>
+        <Login onLogin={verifyLogin} onRegister={handleRegister} initialMode={initialMode} />
+        <InstallBanner />
+      </>
+    );
   }
 
   return (
