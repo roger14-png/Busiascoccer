@@ -9,9 +9,11 @@ interface AuthResult {
 interface LoginProps {
   onLogin: (u: string, p: string) => Promise<AuthResult>;
   onRegister: (u: string, p: string) => Promise<AuthResult>;
+  initialMode?: 'login' | 'register';
+  onBack?: () => void;
 }
 
-export const Login: React.FC<LoginProps> = ({ onLogin, onRegister }) => {
+export const Login: React.FC<LoginProps> = ({ onLogin, onRegister, initialMode = 'login', onBack }) => {
   const [isRegistering, setIsRegistering] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -79,6 +81,10 @@ export const Login: React.FC<LoginProps> = ({ onLogin, onRegister }) => {
     setPassword('');
     setConfirmPass('');
   };
+
+  React.useEffect(() => {
+    setIsRegistering(initialMode === 'register');
+  }, [initialMode]);
 
   return (
     <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4 relative overflow-hidden font-sans">

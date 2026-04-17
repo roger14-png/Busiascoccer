@@ -1181,6 +1181,8 @@ const App: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<ViewCategory>('ALL');
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
+  const [showLanding, setShowLanding] = useState(true);
+  const [landingMode, setLandingMode] = useState<'login' | 'register'>('login');
   
   // Multiple Users State
   const [users, setUsers] = useState<UserAccount[]>([]);
@@ -1353,6 +1355,7 @@ const App: React.FC = () => {
     setIsAuthenticated(false);
     setCurrentUser('');
     setCurrentView(ViewState.DASHBOARD);
+    setShowLanding(true);
   };
   
   const updateCredentials = async (newUsername: string, newPass: string): Promise<{ success: boolean; message?: string }> => {
