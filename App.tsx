@@ -194,9 +194,10 @@ const TeamsView = ({ teams, setTeams }: { teams: Team[], setTeams: React.Dispatc
 
 // 2. Fixture Management
 const FixturesView = ({ 
-  teams, matches, setMatches, category 
+  teams, matches, setMatches, category, isAdmin
 }: { 
-  teams: Team[], matches: Match[], setMatches: React.Dispatch<React.SetStateAction<Match[]>>, category: ViewCategory 
+  teams: Team[], matches: Match[], setMatches: React.Dispatch<React.SetStateAction<Match[]>>, category: ViewCategory,
+  isAdmin: boolean
 }) => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editHomeScore, setEditHomeScore] = useState('');
@@ -375,12 +376,14 @@ const FixturesView = ({
                         ) : (
                           <div className="flex flex-col items-center">
                             <button 
-                              onClick={() => startEditing(match)}
+                              onClick={() => isAdmin && startEditing(match)}
+                              disabled={!isAdmin}
+                              title={!isAdmin ? 'Only admin can enter or edit scores' : undefined}
                               className={`text-sm font-black px-4 py-1.5 rounded flex items-center justify-center space-x-2 min-w-[90px] font-mono tracking-widest
                                 ${match.played 
                                   ? 'bg-black text-emerald-400 border border-emerald-500/30 shadow-[0_0_10px_rgba(16,185,129,0.1)]' 
-                                  : 'bg-white/5 text-slate-500 border border-white/10 hover:border-emerald-400/50 hover:text-emerald-300 transition-colors'
-                                }`}
+                                  : 'bg-white/5 text-slate-500 border border-white/10'
+                                } ${!isAdmin ? 'opacity-50 cursor-not-allowed' : 'hover:border-emerald-400/50 hover:text-emerald-300 transition-colors'}`}
                             >
                               <span>{match.played ? `${match.homeScore} - ${match.awayScore}` : 'VS'}</span>
                             </button>
@@ -411,9 +414,10 @@ const FixturesView = ({
 
 // 3. Results Entry
 const ResultsView = ({ 
-  teams, matches, setMatches, category 
+  teams, matches, setMatches, category, isAdmin 
 }: { 
-  teams: Team[], matches: Match[], setMatches: React.Dispatch<React.SetStateAction<Match[]>>, category: ViewCategory 
+  teams: Team[], matches: Match[], setMatches: React.Dispatch<React.SetStateAction<Match[]>>, category: ViewCategory,
+  isAdmin: boolean
 }) => {
   const [selectedMatchId, setSelectedMatchId] = useState<string | null>(null);
   const [homeScore, setHomeScore] = useState<string>('');
@@ -485,6 +489,11 @@ const ResultsView = ({
                <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse shadow-[0_0_10px_red]"></div>
                <span className="text-xs font-bold text-red-500 uppercase tracking-widest">Live Updates</span>
            </div>
+           {!isAdmin && (
+             <div className="mt-4 rounded-3xl border border-yellow-400/20 bg-yellow-500/10 p-4 text-sm text-yellow-100">
+               Only admin can enter or confirm match scores.
+             </div>
+           )}
         </div>
 
         {Object.keys(matchesByRound).length === 0 && (
@@ -513,8 +522,10 @@ const ResultsView = ({
                 return (
                   <button 
                     key={match.id} 
-                    onClick={() => handleSelectMatch(match)}
-                    className={`w-full p-4 flex items-center justify-between hover:bg-white/5 transition-all text-left group relative overflow-hidden ${isSelected ? 'bg-white/5 border-l-4 border-emerald-500' : 'border-l-4 border-transparent'}`}
+                    onClick={() => isAdmin && handleSelectMatch(match)}
+                    disabled={!isAdmin}
+                    title={!isAdmin ? 'Only admin can select a match for score entry' : undefined}
+                    className={`w-full p-4 flex items-center justify-between transition-all text-left group relative overflow-hidden ${isSelected ? 'bg-white/5 border-l-4 border-emerald-500' : 'border-l-4 border-transparent'} ${!isAdmin ? 'cursor-not-allowed opacity-80' : 'hover:bg-white/5'}`}
                   >
                     <div className="flex-1 flex items-center space-x-3">
                        <div className="transform scale-75">
@@ -571,7 +582,8 @@ const ResultsView = ({
                           min="0"
                           value={homeScore}
                           onChange={(e) => setHomeScore(e.target.value)}
-                          className="w-20 h-24 text-center text-6xl font-black bg-black text-emerald-400 border-2 border-slate-700 rounded-lg focus:border-emerald-500 focus:shadow-[0_0_20px_rgba(16,185,129,0.3)] outline-none transition-all font-mono"
+                          disabled={!isAdmin}
+                          className="w-20 h-24 text-center text-6xl font-black bg-black text-emerald-400 border-2 border-slate-700 rounded-lg focus:border-emerald-500 focus:shadow-[0_0_20px_rgba(16,185,129,0.3)] outline-none transition-all font-mono disabled:opacity-50 disabled:cursor-not-allowed"
                           placeholder="0"
                         />
                         <span className="absolute -bottom-6 left-0 right-0 text-center text-[10px] font-bold text-slate-500 uppercase">Home</span>
@@ -583,7 +595,8 @@ const ResultsView = ({
                           min="0"
                           value={awayScore}
                           onChange={(e) => setAwayScore(e.target.value)}
-                          className="w-20 h-24 text-center text-6xl font-black bg-black text-emerald-400 border-2 border-slate-700 rounded-lg focus:border-emerald-500 focus:shadow-[0_0_20px_rgba(16,185,129,0.3)] outline-none transition-all font-mono"
+                          disabled={!isAdmin}
+                          className="w-20 h-24 text-center text-6xl font-black bg-black text-emerald-400 border-2 border-slate-700 rounded-lg focus:border-emerald-500 focus:shadow-[0_0_20px_rgba(16,185,129,0.3)] outline-none transition-all font-mono disabled:opacity-50 disabled:cursor-not-allowed"
                           placeholder="0"
                         />
                          <span className="absolute -bottom-6 left-0 right-0 text-center text-[10px] font-bold text-slate-500 uppercase">Away</span>
@@ -602,7 +615,9 @@ const ResultsView = ({
 
                  <button 
                    onClick={handleSaveResult}
-                   className="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 text-white py-4 rounded-xl font-black text-lg hover:from-emerald-500 hover:to-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.2)] transition-all flex items-center justify-center space-x-2 uppercase tracking-wide border border-emerald-400/20 mt-4 group"
+                   disabled={!isAdmin}
+                   title={!isAdmin ? 'Only admin can confirm results' : undefined}
+                   className={`w-full bg-gradient-to-r from-emerald-600 to-emerald-500 text-white py-4 rounded-xl font-black text-lg ${!isAdmin ? 'opacity-50 cursor-not-allowed' : 'hover:from-emerald-500 hover:to-emerald-400'} shadow-[0_0_20px_rgba(16,185,129,0.2)] transition-all flex items-center justify-center space-x-2 uppercase tracking-wide border border-emerald-400/20 mt-4 group`}
                  >
                    <Save size={20} className="group-hover:scale-110 transition-transform" />
                    <span className="font-sport tracking-wider">Confirm Result</span>
@@ -1170,6 +1185,7 @@ const App: React.FC = () => {
   // Multiple Users State
   const [users, setUsers] = useState<UserAccount[]>([]);
   const [currentUser, setCurrentUser] = useState<string>(''); // Track logged-in user
+  const isAdmin = currentUser.toLowerCase() === 'admin';
 
   // Initialize auth: validate existing token with backend and load legacy users list for settings
   useEffect(() => {
@@ -1405,9 +1421,9 @@ const App: React.FC = () => {
       case ViewState.TEAMS:
         return <TeamsView teams={teams} setTeams={setTeams} />;
       case ViewState.FIXTURES:
-        return <FixturesView teams={teams} matches={matches} setMatches={setMatches} category={activeCategory} />;
+        return <FixturesView teams={teams} matches={matches} setMatches={setMatches} category={activeCategory} isAdmin={isAdmin} />;
       case ViewState.RESULTS:
-        return <ResultsView teams={teams} matches={matches} setMatches={setMatches} category={activeCategory} />;
+        return <ResultsView teams={teams} matches={matches} setMatches={setMatches} category={activeCategory} isAdmin={isAdmin} />;
       case ViewState.STANDINGS:
         return <StandingsView teams={teams} matches={matches} category={activeCategory} />;
       case ViewState.SETTINGS:
