@@ -2,8 +2,13 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthState, User } from '../types';
 
+interface LoginResult {
+  success: boolean;
+  message?: string;
+}
+
 interface AuthContextType extends AuthState {
-  login: (username: string, password: string) => Promise<boolean>;
+  login: (username: string, password: string) => Promise<LoginResult>;
   register: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
   updateCredentials: (username: string, password: string) => void;
@@ -73,7 +78,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const login = async (username: string, password: string): Promise<boolean> => {
+  const login = async (username: string, password: string): Promise<LoginResult> => {
     try {
       const response = await fetch('http://localhost:4000/api/login', {
         method: 'POST',
@@ -81,9 +86,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         body: JSON.stringify({ username, password }),
       });
 
-      if (!response.ok) return false;
-
       const data = await response.json();
+      if (!response.ok) {
+        return {
+          success: false,
+          message: data?.error || 'Please check your credentials and try again.',
+        };
+      }
+
       if (data && data.token) {
         await AsyncStorage.setItem('fm_token', data.token);
         await AsyncStorage.setItem('fm_last_user', data.username || username);
@@ -92,12 +102,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           currentUser: data.username || username,
           isLoading: false,
         });
-        return true;
+        return { success: true };
       }
     } catch (error) {
       console.warn('Login error:', error);
+      return { success: false, message: 'Unable to reach the auth server.' };
     }
-    return false;
+    return { success: false, message: 'Unexpected server response.' };
   };
 
   const register = async (username: string, password: string): Promise<boolean> => {
@@ -115,13 +126,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const logout = async () => {
-    await AsyncStorage.removeItem('fm_token');
-    await AsyncStorage.removeItem('fm_last_user');
-    setAuthState({
-      isAuthenticated: false,
-      currentUser: '',
-      isLoading: false,
-    });
+    try {
+      const token = await AsyncStorage.getItem('fm_token');
+      if (token) {
+        await fetch('http://localhost:4000/api/logout', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      }
+    } catch (error) {
+      console.warn('Logout error:', error);
+    } finally {
+      await AsyncStorage.removeItem('fm_token');
+      await AsyncStorage.removeItem('fm_last_user');
+      setAuthState({
+        isAuthenticated: false,
+        currentUser: '',
+        isLoading: false,
+      });
+    }
   };
 
   const updateCredentials = async (newUsername: string, newPassword: string) => {

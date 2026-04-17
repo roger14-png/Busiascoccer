@@ -22,9 +22,9 @@ const LoginScreen: React.FC = () => {
       return;
     }
 
-    const success = await login(username.trim(), password.trim());
-    if (!success) {
-      Alert.alert('Login failed', 'Please check your credentials and try again.');
+    const result = await login(username.trim(), password.trim());
+    if (!result.success) {
+      Alert.alert('Login failed', result.message || 'Please check your credentials and try again.');
     }
   };
 
