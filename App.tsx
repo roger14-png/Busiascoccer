@@ -1469,7 +1469,7 @@ const App: React.FC = () => {
   if (!isAuthenticated) {
     return (
       <>
-        <Login onLogin={verifyLogin} onRegister={handleRegister} initialMode={initialMode} />
+<Login onLogin={verifyLogin} onRegister={handleRegister} initialMode={landingMode} />
         <InstallBanner />
       </>
     );
