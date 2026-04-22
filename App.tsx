@@ -1467,13 +1467,24 @@ const App: React.FC = () => {
     </div>;
   }
 
-  const [authView, setAuthView] = useState<'login' | 'signup'>('login');
+  const [authView, setAuthView] = useState<'login' | 'signup'>('signup');
+
+  useEffect(() => {
+    if (location.hash === '#login') {
+      setAuthView('login');
+    } else if (location.hash === '#signup') {
+      setAuthView('signup');
+    }
+  }, []);
 
   if (!isAuthenticated) {
     return (
       <>
         {authView === 'signup' ? (
-          <Signup onRegister={handleRegister} onSwitchToLogin={() => setAuthView('login')} />
+          <Signup onRegister={handleRegister} onSwitchToLogin={() => {
+            setAuthView('login');
+            location.hash = '#login';
+          }} />
         ) : (
           <Login onLogin={verifyLogin} onRegister={handleRegister} />
         )}
