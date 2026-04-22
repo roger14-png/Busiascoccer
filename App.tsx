@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Layout } from './components/Layout';
 import { Login } from './components/Login';
+import { Signup } from './components/Signup';
 import InstallBanner from './components/InstallBanner';
 import { ViewState, Team, Match, Standing, Category } from './types';
 import { generateFixtures, calculateStandings, generateUniqueId } from './services/leagueService';
@@ -1466,10 +1467,16 @@ const App: React.FC = () => {
     </div>;
   }
 
+  const [authView, setAuthView] = useState<'login' | 'signup'>('login');
+
   if (!isAuthenticated) {
     return (
       <>
-<Login onLogin={verifyLogin} onRegister={handleRegister} initialMode={landingMode} />
+        {authView === 'signup' ? (
+          <Signup onRegister={handleRegister} onSwitchToLogin={() => setAuthView('login')} />
+        ) : (
+          <Login onLogin={verifyLogin} onRegister={handleRegister} />
+        )}
         <InstallBanner />
       </>
     );

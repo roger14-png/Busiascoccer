@@ -73,18 +73,11 @@ export const Login: React.FC<LoginProps> = ({ onLogin, onRegister, initialMode =
     setIsRegistering(false);
   };
 
-  const toggleMode = () => {
-    setIsRegistering(!isRegistering);
-    setError('');
-    setSuccessMsg('');
-    setUsername('');
-    setPassword('');
-    setConfirmPass('');
+  const goToSignup = () => {
+    window.location.hash = '#signup';
   };
 
-  React.useEffect(() => {
-    setIsRegistering(initialMode === 'register');
-  }, [initialMode]);
+  // Removed toggle logic - now separate pages
 
   return (
     <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4 relative overflow-hidden font-sans">
@@ -217,14 +210,10 @@ export const Login: React.FC<LoginProps> = ({ onLogin, onRegister, initialMode =
         
         <div className="mt-6 pt-6 border-t border-white/5 flex flex-col items-center space-y-4">
            <button 
-             onClick={toggleMode}
+             onClick={goToSignup}
              className="text-slate-400 hover:text-white text-xs font-medium uppercase tracking-wide transition-colors"
            >
-             {isRegistering ? (
-               <span>Already registered? <span className="text-emerald-400 underline decoration-emerald-500/50 underline-offset-4 decoration-2">Sign In here</span></span>
-             ) : (
-               <span>New Manager? <span className="text-blue-400 underline decoration-blue-500/50 underline-offset-4 decoration-2">Register Club Access</span></span>
-             )}
+             <span>New Manager? <span className="text-blue-400 underline decoration-blue-500/50 underline-offset-4 decoration-2">Register Now</span></span>
            </button>
            
            {!isRegistering && (
